@@ -48,7 +48,7 @@ if st.button("Predict"):
     with st.spinner("Generating SHAP force plot..."):
         try:
             # 使用显式背景数据，避免部署错误
-            explainer = shap.LinearExplainer(lr_model, X_scaled, feature_names=feature_names)
+            explainer = shap.LinearExplainer(model, X_scaled, feature_names=feature_names)
             shap_values = explainer(X_scaled)
 
             plt.clf()
