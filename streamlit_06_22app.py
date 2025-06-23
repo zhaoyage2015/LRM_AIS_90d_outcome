@@ -35,6 +35,7 @@ X_input = pd.DataFrame([feature_values], columns=feature_names)
 X_scaled = scaler.transform(X_input)
 
 # 预测与解释
+# 预测与解释
 if st.button("Predict"):
     proba = model.predict_proba(X_scaled)[0]
     pred_class = model.predict(X_scaled)[0]
@@ -44,30 +45,31 @@ if st.button("Predict"):
     st.markdown(f"- **Probability of Good Outcome**: {proba[0]*100:.2f}%")
 
     # SHAP Force Plot
-   with st.spinner("Generating SHAP force plot..."):
-    try:
-        explainer = shap.LinearExplainer(model, masker=scaler.transform, algorithm="linear")
-        shap_values = explainer(X_input)
+    with st.spinner("Generating SHAP force plot..."):
+        try:
+            # 使用显式背景数据，避免部署错误
+            explainer = shap.Explainer(model, X_scaled, feature_names=feature_names)
+            shap_values = explainer(X_scaled)
 
-        plt.clf()
-        fig = plt.figure(figsize=(12, 3), dpi=600)
+            plt.clf()
+            fig = plt.figure(figsize=(12, 3), dpi=600)
 
-        shap.force_plot(
-            base_value=explainer.expected_value,
-            shap_values=shap_values.values[0],
-            features=X_input.iloc[0],
-            feature_names=feature_names,
-            feature_display_values=X_input.iloc[0].values,  # 显示原始值
-            matplotlib=True,
-            show=False
-        )
+            shap.force_plot(
+                base_value=explainer.expected_value[1],
+                shap_values=shap_values.values[0],
+                features=X_input.iloc[0],
+                feature_names=feature_names,
+                feature_display_values=X_input.iloc[0].values,
+                matplotlib=True,
+                show=False
+            )
 
-        buf = BytesIO()
-        plt.savefig(buf, format="png", bbox_inches="tight", dpi=600)
-        plt.close()
-        st.image(buf.getvalue(), caption="SHAP Force Plot", use_column_width=True)
+            buf = BytesIO()
+            plt.savefig(buf, format="png", bbox_inches="tight", dpi=600)
+            plt.close()
+            st.image(buf.getvalue(), caption="SHAP Force Plot", use_column_width=True)
 
-    except Exception as e:
-        import traceback
-        st.error(f"SHAP explanation failed: {str(e)}")
-        st.text(traceback.format_exc())
+        except Exception as e:
+            import traceback
+            st.error(f"SHAP explanation failed: {str(e)}")
+            st.text(traceback.format_exc())
