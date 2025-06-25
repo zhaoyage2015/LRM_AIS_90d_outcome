@@ -60,21 +60,17 @@ if st.button("Predict"):
         fx = base_value + shap_contrib.sum()
 
         # 绘制 force plot
-        features = pd.Series(np.round(X_scaled[0], 3), index=feature_names)
+        z_scores = np.round(X_scaled[0], 3)
+        feature_labels = [f"{name}\nz={z}" for name, z in zip(feature_names, z_scores)]
+        features_for_plot = pd.Series(z_scores, index=feature_labels)
 
+        # 绘图
         plt.clf()
         fig = plt.figure(figsize=(12, 3), dpi=600)
         shap.force_plot(
-          base_value=base_value,
-          shap_values=shap_contrib,
-          features=features,
-          feature_names=feature_names,
-          matplotlib=True,
-          show=False)
-
-        st.caption(f"base: {base_value:.3f} + sum(SHAP): {shap_contrib.sum():.3f} = f(x): {fx:.3f}")
-
-        buf = BytesIO()
-        plt.savefig(buf, format="png", bbox_inches="tight", dpi=600)
-        plt.close()
-        st.image(buf.getvalue(), caption="SHAP Force Plot", use_container_width=True)
+            base_value=base_value,
+            shap_values=shap_contrib,
+            features=features_for_plot,
+            feature_names=feature_labels,
+            matplotlib=True,
+            show=False)
