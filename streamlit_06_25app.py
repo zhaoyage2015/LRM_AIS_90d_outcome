@@ -62,16 +62,15 @@ if st.button("Predict"):
         # 绘制 force plot
         features = pd.Series(np.round(X_scaled[0], 3), index=feature_names)
 
-        # 绘制 force plot
         plt.clf()
         fig = plt.figure(figsize=(12, 3), dpi=600)
-       shap.force_plot(
-       base_value=base_value,
-       shap_values=shap_contrib,
-       features=features,
-       feature_names=feature_names,
-       matplotlib=True,
-       show=False)
+        shap.force_plot(
+          base_value=base_value,
+          shap_values=shap_contrib,
+          features=features,
+          feature_names=feature_names,
+          matplotlib=True,
+          show=False)
 
         st.caption(f"base: {base_value:.3f} + sum(SHAP): {shap_contrib.sum():.3f} = f(x): {fx:.3f}")
 
