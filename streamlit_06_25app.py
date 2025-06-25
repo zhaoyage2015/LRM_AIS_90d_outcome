@@ -67,5 +67,6 @@ if st.button("Predict"):
         buf = BytesIO()
         plt.savefig(buf, format="png", bbox_inches="tight", dpi=600)
         plt.close()
-        st.image(buf.getvalue(), caption="SHAP Force Plot", use_column_width=True)
+        st.image(buf.getvalue(), caption="SHAP Force Plot", use_container_width=True)
+
 
