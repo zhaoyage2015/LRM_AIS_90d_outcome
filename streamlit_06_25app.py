@@ -43,7 +43,7 @@ if st.button("Predict"):
     st.markdown(f"- **Probability of Good Outcome**: {proba[0]*100:.2f}%")
 
     # SHAP Force Plot
-   with st.spinner("Generating SHAP force plot..."):
+    with st.spinner("Generating SHAP force plot..."):
         try:
             explainer = joblib.load("shap_explainer_06_25.pkl")
         except Exception as e:
