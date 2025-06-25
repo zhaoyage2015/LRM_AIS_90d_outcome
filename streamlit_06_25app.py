@@ -67,7 +67,7 @@ if st.button("Predict"):
 
         # 绘图
         plt.clf()
-        fig = plt.figure(figsize=(12, 3), dpi=600)
+        fig = plt.figure(figsize=(10, 4), dpi=600)
         shap.force_plot(
             base_value=base_value,
             shap_values=shap_contrib,
@@ -77,7 +77,7 @@ if st.button("Predict"):
         )
 
         # 🔧 美化图像（改善特征名拥挤）
-        plt.tight_layout(pad=4.0)  # 减少特征间标签拥挤
+        plt.tight_layout(pad=3.0)  # 减少特征间标签拥挤
         ax = plt.gca()
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
