@@ -43,26 +43,35 @@ if st.button("Predict"):
     st.markdown(f"- **Probability of Good Outcome**: {proba[0]*100:.2f}%")
 
     # SHAP Force Plot
-    with st.spinner("Generating SHAP force plot..."):
+   with st.spinner("Generating SHAP force plot..."):
         try:
             explainer = joblib.load("shap_explainer_06_25.pkl")
         except Exception as e:
             st.warning(f"SHAP explainer not found or failed to load. Using fallback explainer. Error: {e}")
-            explainer = shap.Explainer(model, masker=scaler.transform)
+            from shap.maskers import Independent
+            explainer = shap.Explainer(model, masker=shap.maskers.Independent(X_scaled))
 
-        shap_values = explainer(X_input)
+        # 使用标准化后的输入进行解释（模型实际接收的输入）
+        shap_values = explainer(X_scaled)
 
+        # base value 和 SHAP 值一致性验证
+        base_value = explainer.expected_value[1] if isinstance(explainer.expected_value, (list, np.ndarray)) else explainer.expected_value
+        shap_contrib = shap_values.values[0][:, 1] if shap_values.values.ndim == 3 else shap_values.values[0]
+        fx = base_value + shap_contrib.sum()
+
+        # 绘制 force plot
         plt.clf()
         fig = plt.figure(figsize=(12, 3), dpi=600)
-
         shap.force_plot(
-            base_value=explainer.expected_value,
-            shap_values=shap_values.values[0],
-            features=X_input.iloc[0],
+            base_value=base_value,
+            shap_values=shap_contrib,
+            features=X_scaled[0],  # 注意这里必须是 1D array 或 Series
             feature_names=feature_names,
             matplotlib=True,
             show=False
         )
+
+        st.caption(f"base: {base_value:.3f} + sum(SHAP): {shap_contrib.sum():.3f} = f(x): {fx:.3f}")
 
         buf = BytesIO()
         plt.savefig(buf, format="png", bbox_inches="tight", dpi=600)
