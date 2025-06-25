@@ -31,12 +31,14 @@ with col2:
 # 构造输入
 feature_values = [Age, Baseline_NIHSS, Baseline_mRS, Glucose, WBC, hs_CRP]
 X_input = pd.DataFrame([feature_values], columns=feature_names)
+
+# 预测与解释
 X_scaled = scaler.transform(X_input)
+X_scaled_df = pd.DataFrame(X_scaled, columns=feature_names)
 
 # 预测与解释
 if st.button("Predict"):
-    proba = model.predict_proba(X_scaled)[0]
-    pred_class = model.predict(X_scaled)[0]
+    proba = model.predict_proba(X_scaled_df)[0]
 
     st.markdown("### Prediction Results")
     st.markdown(f"- **Predicted Probability of mRS 3–6**: {proba[1]*100:.2f}%")
@@ -48,25 +50,28 @@ if st.button("Predict"):
             explainer = joblib.load("shap_explainer_06_25.pkl")
         except Exception as e:
             st.warning(f"SHAP explainer not found or failed to load. Using fallback explainer. Error: {e}")
-            explainer = shap.Explainer(model, masker=scaler.transform)
+            from shap.maskers import Independent
+            masker = Independent(X_scaled_df)
+            explainer = shap.LinearExplainer(model, masker=masker)
 
-        shap_values = explainer(X_input)
+        # 获取 shap 值
+        shap_values = explainer(X_scaled_df)
 
+        # 绘图
         plt.clf()
         fig = plt.figure(figsize=(12, 3), dpi=600)
-
         shap.force_plot(
-            base_value=explainer.expected_value,
+            base_value=explainer.expected_value[1],  # 对应 mRS 3–6 的 class 1
             shap_values=shap_values.values[0],
-            features=X_input.iloc[0],
+            features=X_scaled_df.iloc[0],
             feature_names=feature_names,
             matplotlib=True,
-            show=False
+            show=False,
+            contribution_threshold=0.01  # 显示更多变量
         )
 
         buf = BytesIO()
         plt.savefig(buf, format="png", bbox_inches="tight", dpi=600)
         plt.close()
         st.image(buf.getvalue(), caption="SHAP Force Plot", use_container_width=True)
-
 
