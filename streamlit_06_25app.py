@@ -60,6 +60,7 @@ if st.button("Predict"):
         fx = base_value + shap_contrib.sum()
 
         # 构建特征标签：如 Age = 0.123
+                # 构建特征标签：如 Age = 0.123
         z_scores = np.round(X_scaled[0], 3)
         feature_labels = [f"{name} = {z}" for name, z in zip(feature_names, z_scores)]
         features_for_plot = pd.Series(z_scores, index=feature_labels)
@@ -75,9 +76,26 @@ if st.button("Predict"):
             show=False
         )
 
+        # 🔧 美化图像（改善特征名拥挤）
+        plt.tight_layout(pad=4.0)  # 减少特征间标签拥挤
+        ax = plt.gca()
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+
+        # 输出解释公式
         st.caption(f"base: {base_value:.3f} + sum(SHAP): {shap_contrib.sum():.3f} = f(x): {fx:.3f}")
 
+        # 保存高清图像
         buf = BytesIO()
-        plt.savefig(buf, format="png", bbox_inches="tight", dpi=600)
+        plt.savefig(
+            buf,
+            format="png",
+            dpi=600,
+            bbox_inches="tight",
+            pad_inches=0.5,
+            transparent=False,
+            facecolor='white'
+        )
         plt.close()
         st.image(buf.getvalue(), caption="SHAP Force Plot", use_container_width=True)
+
