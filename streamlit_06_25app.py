@@ -54,21 +54,26 @@ if st.button("Predict"):
             masker = Independent(X_scaled_df)
             explainer = shap.LinearExplainer(model, masker=masker)
 
-        # 获取 shap 值
         shap_values = explainer(X_scaled_df)
 
-        # 绘图
+        # Force plot - class 1 (mRS 3–6)
+        base_value = explainer.expected_value[1]
+        shap_contributions = shap_values.values[0][:, 1] if shap_values.values.ndim == 3 else shap_values.values[0]
+
         plt.clf()
         fig = plt.figure(figsize=(12, 3), dpi=600)
         shap.force_plot(
-            base_value=explainer.expected_value[1],  # 对应 mRS 3–6 的 class 1
-            shap_values=shap_values.values[0],
+            base_value=base_value,
+            shap_values=shap_contributions,
             features=X_scaled_df.iloc[0],
             feature_names=feature_names,
             matplotlib=True,
-            show=False,
-            contribution_threshold=0.01  # 显示更多变量
+            show=False
         )
+
+        # Debug: 显示 base + sum(SHAP) = logit
+        logit_val = base_value + shap_contributions.sum()
+        st.caption(f"base: {base_value:.3f} + sum(SHAP): {shap_contributions.sum():.3f} = f(x): {logit_val:.3f}")
 
         buf = BytesIO()
         plt.savefig(buf, format="png", bbox_inches="tight", dpi=600)
