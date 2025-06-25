@@ -59,30 +59,25 @@ if st.button("Predict"):
         shap_contrib = shap_values.values[0][:, 1] if shap_values.values.ndim == 3 else shap_values.values[0]
         fx = base_value + shap_contrib.sum()
 
-        # 绘制 force plot
-            # 绘制 force plot
-    # 构建特征标签：如 Age = 0.123
-z_scores = np.round(X_scaled[0], 3)
-feature_labels = [f"{name} = {z}" for name, z in zip(feature_names, z_scores)]
-features_for_plot = pd.Series(z_scores, index=feature_labels)
+        # 构建特征标签：如 Age = 0.123
+        z_scores = np.round(X_scaled[0], 3)
+        feature_labels = [f"{name} = {z}" for name, z in zip(feature_names, z_scores)]
+        features_for_plot = pd.Series(z_scores, index=feature_labels)
 
-# 绘图
-plt.clf()
-fig = plt.figure(figsize=(12, 3), dpi=600)
-shap.force_plot(
-    base_value=base_value,
-    shap_values=shap_contrib,
-    features=features_for_plot,
-    matplotlib=True,
-    show=False
-)
+        # 绘图
+        plt.clf()
+        fig = plt.figure(figsize=(12, 3), dpi=600)
+        shap.force_plot(
+            base_value=base_value,
+            shap_values=shap_contrib,
+            features=features_for_plot,
+            matplotlib=True,
+            show=False
+        )
 
-st.caption(f"base: {base_value:.3f} + sum(SHAP): {shap_contrib.sum():.3f} = f(x): {fx:.3f}")
+        st.caption(f"base: {base_value:.3f} + sum(SHAP): {shap_contrib.sum():.3f} = f(x): {fx:.3f}")
 
-buf = BytesIO()
-plt.savefig(buf, format="png", bbox_inches="tight", dpi=600)
-plt.close()
-st.image(buf.getvalue(), caption="SHAP Force Plot", use_container_width=True)
-
-
-
+        buf = BytesIO()
+        plt.savefig(buf, format="png", bbox_inches="tight", dpi=600)
+        plt.close()
+        st.image(buf.getvalue(), caption="SHAP Force Plot", use_container_width=True)
