@@ -46,8 +46,9 @@ if st.button("Predict"):
     with st.spinner("Generating SHAP force plot..."):
         try:
             explainer = joblib.load("shap_explainer_06_25.pkl")
-        except:
-            explainer = shap.LinearExplainer(model, masker=scaler.transform, algorithm="linear")
+        except Exception as e:
+            st.warning(f"SHAP explainer not found or failed to load. Using fallback explainer. Error: {e}")
+            explainer = shap.Explainer(model, masker=scaler.transform)
 
         shap_values = explainer(X_input)
 
@@ -59,7 +60,6 @@ if st.button("Predict"):
             shap_values=shap_values.values[0],
             features=X_input.iloc[0],
             feature_names=feature_names,
-            feature_display_values=X_input.iloc[0].values,
             matplotlib=True,
             show=False
         )
@@ -68,3 +68,4 @@ if st.button("Predict"):
         plt.savefig(buf, format="png", bbox_inches="tight", dpi=600)
         plt.close()
         st.image(buf.getvalue(), caption="SHAP Force Plot", use_column_width=True)
+
