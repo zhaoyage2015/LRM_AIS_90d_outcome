@@ -65,12 +65,13 @@ if st.button("Predict"):
         features_for_plot = pd.Series(z_scores, index=feature_labels)
 
         # 绘图
-        plt.clf()
-        fig = plt.figure(figsize=(12, 3), dpi=600)
-        shap.force_plot(
-            base_value=base_value,
-            shap_values=shap_contrib,
-            features=features_for_plot,
-            feature_names=feature_labels,
-            matplotlib=True,
-            show=False)
+        
+       plt.clf()
+       fig = plt.figure(figsize=(12, 3), dpi=600)
+       shap.force_plot(
+           base_value=base_value,
+           shap_values=shap_contrib,
+           features=features_for_plot,  # 已经包含名称和 z 值
+           matplotlib=True,
+           show=False)
+
