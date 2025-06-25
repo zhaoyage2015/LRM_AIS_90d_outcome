@@ -30,13 +30,16 @@ with col2:
 
 # 构造输入
 feature_values = [Age, Baseline_NIHSS, Baseline_mRS, Glucose, WBC, hs_CRP]
-X_input = pd.DataFrame([feature_values], columns=feature_names)
-
-# 预测与解释
-X_scaled = scaler.transform(X_input)
+# =====================
+# ✅ Step 1: 标准化输入
+# =====================
+X_input_df = pd.DataFrame([feature_values], columns=feature_names)
+X_scaled = scaler.transform(X_input_df)
 X_scaled_df = pd.DataFrame(X_scaled, columns=feature_names)
 
-# 预测与解释
+# =====================
+# ✅ Step 2: 预测 + 解释
+# =====================
 if st.button("Predict"):
     proba = model.predict_proba(X_scaled_df)[0]
 
@@ -52,14 +55,14 @@ if st.button("Predict"):
             st.warning(f"SHAP explainer not found or failed to load. Using fallback explainer. Error: {e}")
             from shap.maskers import Independent
             masker = Independent(X_scaled_df)
-            explainer = shap.LinearExplainer(model, masker=masker)
+            explainer = shap.LinearExplainer(model, masker=masker, feature_names=feature_names)
 
         shap_values = explainer(X_scaled_df)
 
-        # Force plot - class 1 (mRS 3–6)
-        base_value = explainer.expected_value[1]
+        base_value = explainer.expected_value[1]  # class 1: mRS 3-6
         shap_contributions = shap_values.values[0][:, 1] if shap_values.values.ndim == 3 else shap_values.values[0]
 
+        # 画图
         plt.clf()
         fig = plt.figure(figsize=(12, 3), dpi=600)
         shap.force_plot(
@@ -71,7 +74,6 @@ if st.button("Predict"):
             show=False
         )
 
-        # Debug: 显示 base + sum(SHAP) = logit
         logit_val = base_value + shap_contributions.sum()
         st.caption(f"base: {base_value:.3f} + sum(SHAP): {shap_contributions.sum():.3f} = f(x): {logit_val:.3f}")
 
@@ -80,3 +82,4 @@ if st.button("Predict"):
         plt.close()
         st.image(buf.getvalue(), caption="SHAP Force Plot", use_container_width=True)
 
+    
