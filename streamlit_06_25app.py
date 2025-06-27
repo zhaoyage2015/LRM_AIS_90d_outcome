@@ -73,12 +73,9 @@ if st.button("Predict"):
             shap_values=shap_contrib,
             features=features_for_plot,
             matplotlib=True,
-            show=False
+            show=False，
+            text_rotation=45
         )
-        for ax in fig.axes:
-            for label in ax.get_xticklabels():
-                label.set_rotation(60)  # 可改为30或60°视密集程度
-                label.set_horizontalalignment('right')  # 使倾斜文字对齐美观
         st.caption(f"base: {base_value:.3f} + sum(SHAP): {shap_contrib.sum():.3f} = f(x): {fx:.3f}")
 
         buf = BytesIO()
