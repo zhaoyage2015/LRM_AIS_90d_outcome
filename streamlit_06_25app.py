@@ -8,7 +8,7 @@ from io import BytesIO
 
 # 页面设置
 st.set_page_config(page_title="AIS Prognosis App", layout="centered")
-st.title("🧠 AIS 90-Day Outcome Prediction (mRS 3–6)")
+st.markdown("<h2 style='text-align: center;'>🧠 AIS 90-Day Outcome Prediction (mRS 3–6)</h2>", unsafe_allow_html=True)
 
 # 加载模型与标准化器
 model = joblib.load('model_06_25.pkl')
