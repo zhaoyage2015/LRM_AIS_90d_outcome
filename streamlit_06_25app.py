@@ -76,7 +76,6 @@ if st.button("Predict"):
             show=False,
             text_rotation=45
         )
-        st.caption(f"base: {base_value:.3f} + sum(SHAP): {shap_contrib.sum():.3f} = f(x): {fx:.3f}")
 
         buf = BytesIO()
         plt.savefig(buf, format="png", bbox_inches="tight", dpi=600)
