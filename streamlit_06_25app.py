@@ -68,6 +68,7 @@ if st.button("Predict"):
         # 绘图
         plt.clf()
         fig = plt.figure(figsize=(10, 4), dpi=600)
+        X_raw_sample = X_train.iloc[sample_idx][selected_features]
         shap.force_plot(
             base_value=base_value,
             shap_values=shap_contrib,
