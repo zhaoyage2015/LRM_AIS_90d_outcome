@@ -62,8 +62,7 @@ if st.button("Predict"):
         # 构建特征标签：如 Age = 0.123
                 # 构建特征标签：如 Age = 0.123
         z_scores = np.round(X_scaled[0], 3)
-        feature_labels = [f"{name} = {z}" for name, z in zip(feature_names, z_scores)]
-        features_for_plot = pd.Series(z_scores, index=feature_labels)
+        features_for_plot = pd.Series(z_scores, index=feature_names)
 
         # 绘图
         # 绘图
